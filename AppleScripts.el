@@ -209,15 +209,22 @@ end tell")))
     (or (not (file-remote-p dir))
         (error "Remote file/directory not supported"))
     (applescript
-     "tell application \"iTerm\"
-    set myTerm to (make new terminal)
-    tell myTerm
-        activate current session
-        launch session \"Default Session\"
-        tell the last session
-            write text \"cd \" & #{dir}
+"tell application \"iTerm2\"
+        activate
+
+        try
+                set _session to current session of current terminal
+        on error
+                set _term to (make new terminal)
+                tell _term
+                        launch session \"Default\"
+                        set _session to current session
+                end tell
+        end try
+
+        tell _session
+                write text \"pushd \" & #{dir} & \"; clear\"
         end tell
-    end tell
 end tell")))
 
 (defun osx-finder-or-terminal (&optional arg)
