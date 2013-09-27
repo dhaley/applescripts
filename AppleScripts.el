@@ -215,7 +215,7 @@ end tell")))
         activate current session
         launch session \"Default Session\"
         tell the last session
-            write text \"cd ~/Downloads; clear; pwd\"
+            write text \"cd \" & #{dir}
         end tell
     end tell
 end tell")))
