@@ -157,6 +157,24 @@ The return value is a list similar to that of `color-values'."
                  "activate"
                  "end tell")))
 
+(defun osx-pathfinder ()
+  "Open Finder.app and reveal `buffer-file-name' if any."
+  (interactive)
+  (let ((dir (expand-file-name
+              (or (and (fboundp 'dired-file-name-at-point)
+                       (dired-file-name-at-point))
+                  (and buffer-file-name
+                       (file-exists-p buffer-file-name)
+                       buffer-file-name)
+                  default-directory))))
+    (or (not (file-remote-p dir))
+        (error "Remote file/directory not supported"))
+    (applescript "set f to POSIX file #{dir}"
+                 "tell application \"Path Finder\""
+                 "reveal f"
+                 "activate"
+                 "end tell")))
+
 (defun osx-terminal ()
   "Open Terminal.app and cd `default-directory'."
   (interactive)
@@ -184,10 +202,34 @@ The return value is a list similar to that of `color-values'."
   activate
 end tell")))
 
+(defun osx-iterm ()
+  "Open iTerm2.app and cd `default-directory'."
+  (interactive)
+  (let ((dir (expand-file-name default-directory)))
+    (or (not (file-remote-p dir))
+        (error "Remote file/directory not supported"))
+    (applescript
+     "tell application \"iTerm\"
+    make new terminal
+    tell the current terminal
+        activate current session
+        launch session \"Default Session\"
+        tell the last session
+            write text \"cd ~/Downloads; clear; pwd\"
+        end tell
+    end tell
+end tell")))
+
 (defun osx-finder-or-terminal (&optional arg)
   "Open Terminal.app if ARG else Finder.app."
   (interactive "P")
   (if arg (osx-terminal) (osx-finder)))
+
+(defun osx-pathfinder-or-iterm (&optional arg)
+  "Open Terminal.app if ARG else Finder.app."
+  (interactive "P")
+  (if arg (osx-iterm) (osx-pathfinder)))
+
 
 (provide 'AppleScripts)
 ;;; AppleScripts.el ends here
