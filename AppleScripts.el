@@ -210,8 +210,8 @@ end tell")))
         (error "Remote file/directory not supported"))
     (applescript
      "tell application \"iTerm\"
-    make new terminal
-    tell the current terminal
+    set myTerm to (make new terminal)
+    tell myTerm
         activate current session
         launch session \"Default Session\"
         tell the last session
